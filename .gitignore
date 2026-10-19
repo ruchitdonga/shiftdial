@@ -4,6 +4,4 @@ __pycache__/
 build/
 dist/
 *.spec
-.claude/
-zestdrop-clone-spec.md
 .impeccable/
