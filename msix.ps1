@@ -1,9 +1,10 @@
 # Packs dist\Shiftdial (run build.ps1 first) into dist\Shiftdial-<version>.msix for the Microsoft Store.
-# The Store signs the package, so it is left unsigned. Identity values come from Partner Center:
+# The Store signs the package, so it is left unsigned. Defaults are the reserved identity from Partner Center
+# (Product identity page); override them only for a different reservation:
 #   powershell -ExecutionPolicy Bypass -File msix.ps1 -Name 12345Shiftdial.Shiftdial -Publisher "CN=..." -PublisherDisplayName "..."
 param(
     [string]$Name = "Shiftdial.Shiftdial",
-    [string]$Publisher = "CN=Shiftdial",
+    [string]$Publisher = "CN=B7392B70-F658-464F-9B22-D0F9A5E4FEAD",
     [string]$PublisherDisplayName = "Shiftdial",
     [string]$Version = "1.0.0.0"  # the Store needs the last part to be 0
 )
