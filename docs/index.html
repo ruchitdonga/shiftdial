@@ -56,6 +56,7 @@
   .btn.primary:hover { filter: brightness(1.08); }
   .fine { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 14px; }
   .hero-dial { justify-self: center; width: min(100%, 440px); }
+  .setup { font-size: 14.5px; color: var(--muted); max-width: 34em; margin: 14px 0 0; }
 
   section { padding: 76px 0; }
   h2 { font-family: var(--label); font-weight: 700; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.05;
@@ -125,10 +126,12 @@
       <p class="lede">A dial of formats opens under your cursor while you drag. Let go on one and the
         converted file appears next to the original. No app to open, no upload.</p>
       <div class="actions">
-        <a class="btn primary" href="https://github.com/shiftdial/shiftdial/releases/latest">Download for Windows</a>
+        <a class="btn primary" href="https://github.com/shiftdial/shiftdial/releases/latest/download/Shiftdial-windows-x64.zip">Download for Windows</a>
         <a class="btn" href="https://github.com/shiftdial/shiftdial">View source</a>
       </div>
-      <div class="fine">Windows 10 / 11 · free · runs offline</div>
+      <div class="fine">136 MB zip · unzip, then run Shiftdial.exe · Windows 10 / 11 · free · offline</div>
+      <p class="setup">Windows may say “Windows protected your PC” because the app isn't signed yet:
+        click <em>More info</em>, then <em>Run anyway</em>. Shiftdial then waits in the tray.</p>
     </div>
     <picture class="hero-dial">
       <source srcset="img/dial-light.png" media="(prefers-color-scheme: light)">
