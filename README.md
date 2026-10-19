@@ -60,7 +60,7 @@ normalize and mono/stereo for audio; merge, split, rotate, delete pages and comp
 
 ## Install
 
-Grab `Shiftdial.zip` from [Releases](../../releases), unzip it somewhere permanent and run
+Grab the zip from [Releases](../../releases/latest), unzip it somewhere permanent and run
 `Shiftdial.exe`. Windows SmartScreen will warn because the build isn't signed: *More info → Run anyway*.
 Turn on *Start with Windows* from the tray icon.
 
