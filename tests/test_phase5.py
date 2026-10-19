@@ -50,3 +50,7 @@ def test_startup_unavailable_from_source() -> None:
     assert startup.command() is None
     with pytest.raises(RuntimeError):
         startup.set_enabled(True, TEST_KEY)
+
+
+def test_not_packaged_from_source() -> None:
+    assert startup.packaged() is False

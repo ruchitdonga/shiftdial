@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shiftdial privacy</title>
+<link rel="icon" href="img/icon.png">
+<style>
+  :root { --surface: #eeece6; --text: #1d1c1a; --muted: #6f6c64; --signal: #f04e12; color-scheme: light dark; }
+  @media (prefers-color-scheme: dark) { :root { --surface: #161513; --text: #ecebe5; --muted: #8e8b83; --signal: #ff5b1f; } }
+  body { margin: 0; background: var(--surface); color: var(--text); font: 17px/1.6 "Bahnschrift", system-ui, sans-serif; }
+  main { max-width: 680px; margin: 0 auto; padding: 56px 20px 80px; }
+  h1 { font-size: 36px; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 32px 0 6px; }
+  p, li { color: var(--muted); }
+  a { color: var(--signal); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy</h1>
+  <p>Shiftdial, last updated 19 October 2026.</p>
+
+  <h2>What Shiftdial collects</h2>
+  <p>Nothing. Shiftdial has no account, no telemetry, no analytics and no ads, and it makes no network
+    connections. Files you convert are read and written only on your own PC.</p>
+
+  <h2>What it reads while running</h2>
+  <ul>
+    <li>Whether the left mouse button, Shift and Ctrl are held, so it can open the dial during a drag. It does not record keystrokes.</li>
+    <li>The files you drop on the dial, to convert them. Results are saved next to the originals.</li>
+  </ul>
+
+  <h2>What it stores</h2>
+  <p>Your settings and a log of conversion errors, in <code>%LOCALAPPDATA%\Shiftdial</code> on your PC. They never
+    leave it. Uninstalling the Microsoft Store version deletes them too.</p>
+
+  <h2>Contact</h2>
+  <p>Questions: <a href="https://github.com/shiftdial/shiftdial/issues">open an issue on GitHub</a>.</p>
+  <p><a href="./">Back to Shiftdial</a></p>
+</main>
+</body>
+</html>

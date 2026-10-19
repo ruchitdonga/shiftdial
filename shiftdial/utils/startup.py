@@ -1,6 +1,7 @@
 """Start with Windows: one value under HKCU\\...\\Run (per user, no admin rights needed)."""
 from __future__ import annotations
 
+import ctypes
 import sys
 import winreg
 
@@ -11,6 +12,12 @@ VALUE = "Shiftdial"
 def command() -> str | None:
     """What Windows should run at sign-in: the built Shiftdial.exe."""
     return f'"{sys.executable}"' if getattr(sys, "frozen", False) else None
+
+
+def packaged() -> bool:
+    """True inside the Store (MSIX) build, where Windows owns startup through the manifest's startup task."""
+    n = ctypes.c_uint32(0)
+    return ctypes.windll.kernel32.GetCurrentPackageFullName(ctypes.byref(n), None) != 15700  # APPMODEL_ERROR_NO_PACKAGE
 
 
 def is_enabled(key: str = RUN_KEY) -> bool:
