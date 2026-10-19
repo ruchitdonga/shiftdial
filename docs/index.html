@@ -89,7 +89,43 @@
   .btn.primary { background: var(--signal); border-color: var(--signal); color: var(--on-signal); }
   .btn.primary:hover { filter: brightness(1.08); }
   .fine { font-family: var(--mono); font-size: 12.5px; color: var(--muted); margin-top: 14px; }
-  .hero-dial { justify-self: center; width: min(100%, 540px); }
+  .hero-dial { justify-self: center; width: min(100%, 540px); border-radius: 50%; outline-offset: 6px; }
+  .hero-dial svg { display: block; width: 100%; height: auto; overflow: visible; user-select: none; }
+  .hero-dial:focus-visible { outline: 2px solid var(--signal); }
+  .hint { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+  /* The live dial: same parts as the app's. */
+  .d-disc { fill: var(--surface); stroke: var(--line); }
+  .d-tick { stroke: var(--muted); stroke-opacity: .45; transition: stroke .15s, stroke-opacity .15s;
+            animation: d-in .35s both; animation-delay: calc(var(--i) * 6ms); }
+  .d-tick.major { stroke-opacity: 1; }
+  .d-tick.lit { stroke: var(--signal); stroke-opacity: 1; }
+  .d-sep { stroke: var(--line); }
+  .d-face { fill: var(--raised); }
+  .d-arc, .d-needle { stroke: var(--signal); fill: none; }
+  .d-turn { transition: transform .2s cubic-bezier(.2, .8, .2, 1), opacity .15s; }
+  .d-label { font-family: var(--label); font-weight: 600; font-size: 15px; letter-spacing: .08em; fill: var(--text);
+             cursor: pointer; transition: fill .15s; animation: d-in .3s both; animation-delay: calc(120ms + var(--i) * 35ms); }
+  .d-label.on { fill: var(--signal); }
+  .d-hit { fill: transparent; cursor: pointer; }
+  .d-knob { fill: var(--raised); stroke: var(--line); transition: r .35s cubic-bezier(.3, 1.6, .5, 1); }
+  .d-grip { fill: none; stroke: var(--line); stroke-dasharray: 1 3; transition: r .35s cubic-bezier(.3, 1.6, .5, 1); }
+  .d-small { font-family: var(--label); font-weight: 600; font-size: 8.5px; letter-spacing: .14em; fill: var(--muted); }
+  .d-big { font-family: var(--label); font-weight: 600; font-size: 17px; letter-spacing: .06em; fill: var(--text); }
+  .d-big.num { font-family: var(--mono); font-weight: 500; font-size: 26px; letter-spacing: 0; }
+  .d-big.done { fill: var(--signal); }
+  .d-progress { stroke: var(--signal); fill: none; stroke-width: 2.5; transition: stroke-dasharray .1s linear; }
+  @keyframes d-in { from { opacity: 0; } }
+  .d-flash { animation: d-flash .45s ease-out; }
+  @keyframes d-flash { 0% { fill: var(--signal); } 100% { fill: var(--raised); } }
+  @media (prefers-reduced-motion: reduce) {
+    .d-tick, .d-label, .d-turn, .d-knob, .d-grip, .d-flash { animation: none; transition: none; }
+  }
+
+  /* Theme switch: the new theme grows out of the button (View Transitions), the icon turns. */
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  .theme svg { transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
+  .theme.spin svg { transform: rotate(180deg); }
   .setup { font-size: 14.5px; color: var(--muted); max-width: 34em; margin: 14px 0 0; }
 
   section { padding: 76px 0; }
@@ -170,7 +206,8 @@
       <p class="setup">Windows may say “Windows protected your PC” because the app isn't signed yet:
         click <em>More info</em>, then <em>Run anyway</em>. Shiftdial then waits in the tray.</p>
     </div>
-    <div class="hero-dial">
+    <div class="hero-dial" id="dial" tabindex="0" role="group"
+         aria-label="Try the dial: arrow keys pick a format, Enter converts">
       <img class="on-light" src="img/dial-light.png" alt="The Shiftdial formats dial with WEBP selected">
       <img class="on-dark" src="img/dial-formats.png" alt="The Shiftdial formats dial with WEBP selected">
     </div>
@@ -284,13 +321,151 @@
   </footer>
 </div>
 <script>
-  document.querySelector(".theme").addEventListener("click", function () {
-    var root = document.documentElement;
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelector(".theme").addEventListener("click", function (e) {
+    var root = document.documentElement, btn = e.currentTarget;
     var dark = root.dataset.theme ? root.dataset.theme === "dark"
                                   : matchMedia("(prefers-color-scheme: dark)").matches;
-    root.dataset.theme = dark ? "light" : "dark";
-    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+    function apply() {
+      root.dataset.theme = dark ? "light" : "dark";
+      try { localStorage.setItem("theme", root.dataset.theme); } catch (err) {}
+    }
+    btn.classList.toggle("spin");
+    if (!document.startViewTransition || reduce) return apply();
+    var r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    var end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    document.startViewTransition(apply).ready.then(function () {
+      root.animate({ clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + end + "px at " + x + "px " + y + "px)"] },
+                   { duration: 600, easing: "cubic-bezier(.2, .8, .2, 1)", pseudoElement: "::view-transition-new(root)" });
+    });
   });
+
+  (function dial() {
+    var host = document.getElementById("dial");
+    var items = ["png", "jpg", "webp", "avif", "tiff", "gif", "bmp", "ico", "pdf", "svg", "zip"];
+    var N = items.length, SPAN = 360 / N, R = 150, RIN = 52, NS = "http://www.w3.org/2000/svg";
+    function pt(r, deg) { var a = deg * Math.PI / 180; return [r * Math.sin(a), -r * Math.cos(a)]; }  // 0° = 12 o'clock
+    function el(tag, attrs, parent) {
+      var n = document.createElementNS(NS, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      (parent || svg).appendChild(n);
+      return n;
+    }
+    function sector(r0, r1, a0, a1) {
+      var p = [pt(r1, a0), pt(r1, a1), pt(r0, a1), pt(r0, a0)], big = a1 - a0 > 180 ? 1 : 0;
+      return "M" + p[0] + "A" + r1 + " " + r1 + " 0 " + big + " 1 " + p[1] + "L" + p[2] +
+             "A" + r0 + " " + r0 + " 0 " + big + " 0 " + p[3] + "Z";
+    }
+
+    host.innerHTML = "";
+    var svg = el("svg", { viewBox: "-160 -160 320 320", role: "img", "aria-label": "Shiftdial formats dial" }, host);
+    el("circle", { class: "d-disc", r: 149.5 });
+    var face = el("g", { class: "d-turn" });
+    el("path", { class: "d-face", d: sector(RIN + 2, R - 16, -SPAN / 2, SPAN / 2) }, face);
+    var ticks = [];
+    for (var k = 0; k < 72; k++) {
+      var major = Math.abs(((k * 5 + SPAN / 2) % SPAN) - SPAN) < 2.6 || ((k * 5 + SPAN / 2) % SPAN) < 2.6;
+      var a = pt(R - 4, k * 5), b = pt(R - (major ? 12 : 8), k * 5);
+      ticks.push(el("line", { class: "d-tick" + (major ? " major" : ""), x1: a[0], y1: a[1], x2: b[0], y2: b[1],
+                              style: "--i:" + k }));
+    }
+    for (var i = 0; i < N; i++) {
+      var s0 = pt(RIN + 8, i * SPAN + SPAN / 2), s1 = pt(R - 20, i * SPAN + SPAN / 2);
+      el("line", { class: "d-sep", x1: s0[0], y1: s0[1], x2: s1[0], y2: s1[1] });
+    }
+    var arcG = el("g", { class: "d-turn" });
+    var e0 = pt(R - 15, -SPAN / 2 + 1.5), e1 = pt(R - 15, SPAN / 2 - 1.5);
+    el("path", { class: "d-arc", "stroke-width": 2.5, d: "M" + e0 + "A" + (R - 15) + " " + (R - 15) + " 0 0 1 " + e1 }, arcG);
+    var progress = el("circle", { class: "d-progress", r: R - 15, pathLength: 100, transform: "rotate(-90)",
+                                  "stroke-dasharray": "0 100", opacity: 0 });
+    var labels = items.map(function (name, i) {
+      var c = pt((RIN + R - 16) / 2 + 2, i * SPAN);
+      var t = el("text", { class: "d-label", x: c[0], y: c[1] + 5, "text-anchor": "middle", style: "--i:" + i });
+      t.textContent = name.toUpperCase();
+      return t;
+    });
+    var hits = items.map(function (_, i) {
+      return el("path", { class: "d-hit", d: sector(RIN, R, i * SPAN - SPAN / 2, i * SPAN + SPAN / 2) });
+    });
+    var knob = el("circle", { class: "d-knob", r: 46 });
+    var grip = el("circle", { class: "d-grip", r: 41 });
+    var needle = el("g", { class: "d-turn" });
+    el("line", { class: "d-needle", x1: 0, y1: -34, x2: 0, y2: -43, "stroke-width": 2.5, "stroke-linecap": "round" }, needle);
+    var top = el("text", { class: "d-small", y: -16, "text-anchor": "middle" });
+    var big = el("text", { class: "d-big", y: 7, "text-anchor": "middle" });
+    var bottom = el("text", { class: "d-small", y: 26, "text-anchor": "middle" });
+
+    var sel = 2, angle = sel * SPAN, busy = false, touched = false;
+    function readout(t, m, b, cls) {
+      top.textContent = t; big.textContent = m; bottom.textContent = b;
+      big.setAttribute("class", "d-big" + (cls ? " " + cls : ""));
+    }
+    function select(i) {
+      if (busy) return;
+      var diff = ((i * SPAN - angle) % 360 + 540) % 360 - 180;  // turn the short way round
+      angle += diff;
+      sel = i;
+      [face, arcG, needle].forEach(function (g) { g.style.transform = "rotate(" + angle + "deg)"; });
+      labels.forEach(function (t, j) { t.classList.toggle("on", j === i); });
+      ticks.forEach(function (t, k) {
+        var off = ((k * 5 - i * SPAN) % 360 + 540) % 360 - 180;
+        t.classList.toggle("lit", Math.abs(off) < SPAN / 2 - 1.5);
+      });
+      readout("FORMATS", items[i].toUpperCase(), "IMAGES");
+    }
+    function convert(i) {
+      if (busy) return;
+      select(i);
+      busy = true;
+      face.firstChild.classList.remove("d-flash"); void face.getBBox(); face.firstChild.classList.add("d-flash");
+      [face, arcG].forEach(function (g) { g.style.opacity = 0; });
+      labels.forEach(function (t) { t.style.opacity = .15; });
+      knob.setAttribute("r", 72); grip.setAttribute("r", 66);
+      needle.firstChild.setAttribute("y1", -58); needle.firstChild.setAttribute("y2", -69);
+      progress.setAttribute("opacity", 1);
+      var t0 = performance.now(), ms = reduce ? 1 : 1800;
+      (function frame(now) {
+        var p = Math.min(1, (now - t0) / ms);
+        progress.setAttribute("stroke-dasharray", (p * 100) + " 100");
+        needle.style.transform = "rotate(" + (p * 360) + "deg)";
+        ticks.forEach(function (t, k) { t.classList.toggle("lit", k < p * 72); });
+        readout("→ " + items[i].toUpperCase(), Math.round(p * 100) + "%", "", "num");
+        if (p < 1) return requestAnimationFrame(frame);
+        readout("→ " + items[i].toUpperCase(), "SAVED", "photo." + items[i], "done");
+        setTimeout(function () {
+          progress.setAttribute("opacity", 0); progress.setAttribute("stroke-dasharray", "0 100");
+          knob.setAttribute("r", 46); grip.setAttribute("r", 41);
+          needle.firstChild.setAttribute("y1", -34); needle.firstChild.setAttribute("y2", -43);
+          [face, arcG].forEach(function (g) { g.style.opacity = 1; });
+          labels.forEach(function (t) { t.style.opacity = ""; });
+          busy = false;
+          angle = 360 * Math.round(angle / 360);  // needle went round once; keep the next turn short
+          select(i);
+        }, 1400);
+      })(t0);
+    }
+
+    hits.forEach(function (h, i) {
+      h.addEventListener("pointerenter", function () { touched = true; select(i); });
+      h.addEventListener("click", function () { touched = true; convert(i); });
+    });
+    labels.forEach(function (t, i) { t.addEventListener("click", function () { touched = true; convert(i); }); });
+    host.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") select((sel + 1) % N);
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") select((sel + N - 1) % N);
+      else if (e.key === "Enter" || e.key === " ") convert(sel);
+      else return;
+      touched = true;
+      e.preventDefault();
+    });
+    select(sel);
+    if (!reduce) setInterval(function () { if (!touched && !busy) select((sel + 1) % N); }, 1600);
+    var hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "hover a format · click to convert";
+    host.appendChild(hint);
+  })();
 </script>
 </body>
 </html>
