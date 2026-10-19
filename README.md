@@ -100,5 +100,5 @@ Settings live in `%LOCALAPPDATA%\Shiftdial\settings.json`, logs in `%LOCALAPPDAT
 
 ## Licence
 
-Not chosen yet. The release bundles ffmpeg (GPL) and PyMuPDF (AGPL), whose licences apply to the
-built app.
+MIT for the code in this repository (see [LICENSE](LICENSE)). The release bundles ffmpeg (GPL) and
+PyMuPDF (AGPL), whose licences apply to the built app.
