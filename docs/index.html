@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
   try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  document.documentElement.classList.add("js");
 </script>
 <style>
   :root {
@@ -34,7 +35,7 @@
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
   /* Graph-paper dots, like an instrument faceplate; they give wide screens texture instead of empty sides. */
   body { margin: 0; color: var(--text); font: 17px/1.6 var(--body); background-color: var(--surface);
          background-image: radial-gradient(var(--grid) 1px, transparent 1.2px); background-size: 22px 22px; }
@@ -126,6 +127,30 @@
   ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
   .theme svg { transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
   .theme.spin svg { transform: rotate(180deg); }
+  /* Scroll reveal: elements rise in as they enter the viewport; dial screenshots turn into place. */
+  .js .rv { opacity: 0; transform: translateY(26px);
+            transition: opacity .8s cubic-bezier(.2, .8, .2, 1), transform .8s cubic-bezier(.2, .8, .2, 1);
+            transition-delay: var(--d, 0s); }
+  .js .rv.dialfig { transform: rotate(-28deg) scale(.88); }
+  .js .rv.in { opacity: 1; transform: none; }
+  .dialfig img { transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+  .dialfig:hover img { transform: rotate(9deg) scale(1.02); }
+  .shots img { transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .35s; }
+  .shots figure:hover img { transform: translateY(-6px); box-shadow: 0 22px 44px -18px rgba(0, 0, 0, .45); }
+  .step { transition: background .25s; }
+  .step:hover { background: var(--raised); }
+  .step:hover .n { animation: blink .5s steps(2) 2; }
+  @keyframes blink { 50% { opacity: 0; } }
+  tr { transition: background .2s; }
+  tr:hover td { background: var(--raised); }
+  .btn { transition: transform .15s, filter .15s, border-color .15s; }
+  .btn:hover { transform: translateY(-2px); }
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--signal);
+                  transform-origin: 0 50%; transform: scaleX(0); z-index: 10; }
+  @media (prefers-reduced-motion: reduce) {
+    .js .rv { opacity: 1; transform: none; transition: none; }
+    .dialfig:hover img, .shots figure:hover img, .btn:hover { transform: none; }
+  }
   .setup { font-size: 14.5px; color: var(--muted); max-width: 34em; margin: 14px 0 0; }
 
   section { padding: 76px 0; }
@@ -178,6 +203,7 @@
 </style>
 </head>
 <body>
+<div class="progress-bar" aria-hidden="true"></div>
 <div class="wrap">
   <header>
     <a class="brand" href="#"><img src="img/icon.png" alt="">Shiftdial</a>
@@ -235,7 +261,7 @@
 <section>
   <div class="wrap">
     <div class="pair">
-      <figure><img src="img/dial-tools.png" alt="The tools dial for a video file"><figcaption>Ctrl+Shift on a video</figcaption></figure>
+      <figure class="dialfig"><img class="on-light" src="img/dial-tools-light.png" alt="The tools dial for a video file"><img class="on-dark" src="img/dial-tools.png" alt="The tools dial for a video file"><figcaption>Ctrl+Shift on a video</figcaption></figure>
       <div>
         <div class="caps">Tools</div>
         <h2>Trim, crop, compress, without the editor.</h2>
@@ -245,8 +271,8 @@
       </div>
     </div>
     <div class="shots">
-      <figure><img src="img/crop.png" alt="Crop window with aspect presets"><figcaption>Crop, with aspect presets</figcaption></figure>
-      <figure><img src="img/watermark.png" alt="Watermark window with a live preview"><figcaption>Watermark, live preview</figcaption></figure>
+      <figure><img class="on-light" src="img/crop-light.png" alt="Crop window with aspect presets"><img class="on-dark" src="img/crop.png" alt="Crop window with aspect presets"><figcaption>Crop, with aspect presets</figcaption></figure>
+      <figure><img class="on-light" src="img/watermark-light.png" alt="Watermark window with a live preview"><img class="on-dark" src="img/watermark.png" alt="Watermark window with a live preview"><figcaption>Watermark, live preview</figcaption></figure>
     </div>
   </div>
 </section>
@@ -261,7 +287,7 @@
         the percent counts up. Click it when it reads <em>saved</em> to open the folder.
         Nothing is ever overwritten, and a cancelled job leaves nothing behind.</p>
     </div>
-    <figure><img src="img/readout.png" alt="The dial showing 62 percent"><figcaption>Converting to GIF, 62%</figcaption></figure>
+    <figure class="dialfig"><img class="on-light" src="img/readout-light.png" alt="The dial showing 62 percent"><img class="on-dark" src="img/readout.png" alt="The dial showing 62 percent"><figcaption>Converting to GIF, 62%</figcaption></figure>
   </div>
 </section>
 
@@ -465,6 +491,34 @@
     hint.className = "hint";
     hint.textContent = "hover a format · click to convert";
     host.appendChild(hint);
+  })();
+
+  (function reveal() {
+    var els = document.querySelectorAll(".hero > div:first-child > *, section .caps, section h2, section .intro, " +
+      ".step, .pair > figure, .shots figure, tr, .note, .facts > div, pre");
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    els.forEach(function (el) {
+      // Siblings stagger, so a row of cards fills in left to right.
+      var i = Array.prototype.indexOf.call(el.parentNode.children, el);
+      el.style.setProperty("--d", Math.min(i, 10) * 70 + "ms");
+      el.classList.add("rv");
+      io.observe(el);
+    });
+  })();
+
+  (function scrollBar() {
+    var bar = document.querySelector(".progress-bar");
+    function update() {
+      var max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = "scaleX(" + (max > 0 ? scrollY / max : 0) + ")";
+    }
+    addEventListener("scroll", update, { passive: true });
+    addEventListener("resize", update);
+    update();
   })();
 </script>
 </body>
