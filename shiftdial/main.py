@@ -138,25 +138,24 @@ def main() -> int:
         act.triggered.connect(choose)
         theme_menu.addAction(act)
 
-    if startup.packaged():
-        # The Store build's Run key would land in its private registry; Windows' startup list owns it instead.
-        menu.addAction(QAction("Start with Windows…", menu, triggered=lambda: os.startfile("ms-settings:startupapps")))
-    else:
-        autostart = QAction("Start with Windows", menu, checkable=True)
-        if startup.command() is None:
-            autostart.setEnabled(False)
-            autostart.setText("Start with Windows (in Shiftdial.exe)")
+    autostart = QAction("Start with Windows", menu, checkable=True)
+    if startup.command() is None:
+        autostart.setEnabled(False)
+        autostart.setText("Start with Windows (in Shiftdial.exe)")
 
-        def toggle_autostart(on: bool) -> None:
-            try:
-                startup.set_enabled(on)
-            except OSError as e:
-                tray.showMessage("Shiftdial", f"Couldn't change startup: {e}", QSystemTrayIcon.MessageIcon.Warning)
-            autostart.setChecked(startup.is_enabled())
+    def toggle_autostart(on: bool) -> None:
+        try:
+            startup.set_enabled(on)
+        except startup.NeedsSettings:
+            tray.showMessage("Shiftdial", "You turned Shiftdial off in Windows' Startup apps. Switch it back on there.")
+            os.startfile("ms-settings:startupapps")
+        except OSError as e:
+            tray.showMessage("Shiftdial", f"Couldn't change startup: {e}", QSystemTrayIcon.MessageIcon.Warning)
+        autostart.setChecked(startup.is_enabled())
 
-        autostart.triggered.connect(toggle_autostart)
-        menu.aboutToShow.connect(lambda: autostart.setChecked(startup.is_enabled()))
-        menu.addAction(autostart)
+    autostart.triggered.connect(toggle_autostart)
+    menu.aboutToShow.connect(lambda: autostart.setChecked(startup.is_enabled()))
+    menu.addAction(autostart)
     menu.addSeparator()
     menu.addAction(QAction("Open logs", menu, triggered=lambda: os.startfile(data_dir() / "logs")))
     menu.addAction(QAction("Quit", menu, triggered=app.quit))

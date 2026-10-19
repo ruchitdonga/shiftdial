@@ -54,3 +54,29 @@ def test_startup_unavailable_from_source() -> None:
 
 def test_not_packaged_from_source() -> None:
     assert startup.packaged() is False
+
+
+def test_store_startup_task(monkeypatch) -> None:
+    from winrt.windows.applicationmodel import StartupTaskState as S
+
+    class Task:
+        state, disabled = S.DISABLED, False
+
+        async def request_enable_async(self):
+            if self.state != S.DISABLED_BY_USER:
+                self.state = S.ENABLED
+            return self.state
+
+        def disable(self):
+            self.state, self.disabled = S.DISABLED, True
+
+    task = Task()
+    monkeypatch.setattr(startup, "packaged", lambda: True)
+    monkeypatch.setattr(startup, "_task", lambda: task)
+    startup.set_enabled(True)
+    assert startup.is_enabled()
+    startup.set_enabled(False)
+    assert task.disabled and not startup.is_enabled()
+    task.state = S.DISABLED_BY_USER  # switched off in Windows: only Settings can turn it back on
+    with pytest.raises(startup.NeedsSettings):
+        startup.set_enabled(True)

@@ -2,7 +2,7 @@
 # Run from anywhere:  powershell -ExecutionPolicy Bypass -File build.ps1
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
-if (Get-Process Shiftdial -ErrorAction SilentlyContinue) { throw "Shiftdial.exe is running and locks dist\Shiftdial. Quit it from the tray icon, then build again." }
+if (Get-Process Shiftdial -ErrorAction SilentlyContinue | Where-Object Path -like "$PSScriptRoot\dist\*") { throw "Shiftdial.exe is running and locks dist\Shiftdial. Quit it from the tray icon, then build again." }
 $py = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $py)) { throw "No .venv found. Create it first: py -3.12 -m venv .venv; .venv\Scripts\python -m pip install -r requirements.txt" }
 

@@ -5,6 +5,9 @@ PyMuPDF==1.28.2
 py7zr==1.1.4
 PySide6-Essentials==6.12.0
 PySide6-Addons==6.12.0  # QtMultimedia for trim/frame previews
+winrt-runtime==3.2.1  # Store build: switch its startup task
+winrt-Windows.ApplicationModel==3.2.1
+winrt-Windows.Foundation==3.2.1
 PyYAML==6.0.3  # data: YAML
 tomli_w==1.2.0  # data: writing TOML (reading is in the standard library)
 xmltodict==1.0.4  # data: XML
