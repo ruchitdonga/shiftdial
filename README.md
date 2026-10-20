@@ -101,7 +101,18 @@ output is written to `name.tmp.ext` and renamed only when it's complete.
 
 Settings live in `%LOCALAPPDATA%\Shiftdial\settings.json`, logs in `%LOCALAPPDATA%\Shiftdial\logs`.
 
+## Contributing
+
+Pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Licence
 
-MIT for the code in this repository (see [LICENSE](LICENSE)). The release bundles ffmpeg (GPL) and
-PyMuPDF (AGPL), whose licences apply to the built app.
+GNU AGPL v3 (see [LICENSE](LICENSE)). You may use, study, change and share the code, but anything you
+publish that is based on it must also be released under the AGPL with its full source, and must keep the
+credit to this project.
+
+The name "Shiftdial", the dial logo and the app icon are not covered by the licence. A published fork needs
+its own name and icon; see [TRADEMARKS.md](TRADEMARKS.md).
+
+Version 1.0 was released under the MIT licence; later versions are AGPL. The app bundles ffmpeg (GPL) and
+PyMuPDF (AGPL).
