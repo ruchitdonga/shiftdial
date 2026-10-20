@@ -214,6 +214,7 @@
     <nav>
       <a href="#how">How it works</a>
       <a href="#formats">Formats</a>
+      <a href="#tools">Tools</a>
       <a href="https://github.com/shiftdial/shiftdial">Source</a>
       <button class="theme" type="button" aria-label="Switch between light and dark">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
@@ -229,12 +230,13 @@
       <p class="lede">A file converter for Windows. A dial of formats opens under your cursor while you drag. Let go on one and the
         converted file appears next to the original. No app to open, no upload.</p>
       <div class="actions">
-        <a class="btn primary" href="https://github.com/shiftdial/shiftdial/releases/latest/download/Shiftdial-windows-x64.zip">Download for Windows</a>
-        <a class="btn" href="https://github.com/shiftdial/shiftdial">View source</a>
+        <a class="btn primary" href="https://apps.microsoft.com/detail/9NC93KBD74XD">Get it from Microsoft Store</a>
+        <a class="btn" href="https://github.com/shiftdial/shiftdial/releases/latest/download/Shiftdial-windows-x64.zip">Portable zip</a>
       </div>
-      <div class="fine">136 MB zip · unzip, then run Shiftdial.exe · Windows 10 / 11 · free · offline</div>
-      <p class="setup">Windows may say “Windows protected your PC” because the app isn't signed yet:
-        click <em>More info</em>, then <em>Run anyway</em>. Shiftdial then waits in the tray.</p>
+      <div class="fine">Free · Windows 10 / 11 · offline · the Store version installs without warnings and updates itself</div>
+      <p class="setup">Shiftdial waits in the tray and starts with Windows; switch that off from its tray menu.
+        The portable zip (136 MB) isn't signed, so Windows may say “Windows protected your PC”:
+        click <em>More info</em>, then <em>Run anyway</em>.</p>
     </div>
     <div class="hero-dial" id="dial" tabindex="0" role="group"
          aria-label="Try the dial: arrow keys pick a format, Enter converts">
@@ -313,6 +315,23 @@
       <div class="fmt"><h3>More</h3><p class="from">Subtitles, fonts, 3D models, DXF</p><div class="to"><span>SRT</span><span>VTT</span><span>ASS</span><span>WOFF2</span><span>TTF</span><span>STL</span><span>OBJ</span><span>GLB</span><span>SVG</span></div></div>
     </div>
     <p class="note">Office documents convert through the Microsoft Office you already have, or LibreOffice.</p>
+  </div>
+</section>
+
+<hr class="rule">
+<section id="tools">
+  <div class="wrap">
+    <div class="caps">Tools</div>
+    <h2>Hold Ctrl+Shift for tools.</h2>
+    <p class="intro">The dial shows only the tools that fit what you're dragging. Tools with settings open one small window with a preview.</p>
+    <div class="fmts">
+      <div class="fmt"><h3>Images</h3><p class="from">PNG, JPG, HEIC, WEBP and the rest</p><div class="to"><span>RESIZE</span><span>COMPRESS</span><span>CROP</span><span>ROTATE</span><span>GRAYSCALE</span><span>STRIP EXIF</span><span>WATERMARK</span></div></div>
+      <div class="fmt"><h3>Video</h3><p class="from">Compress to a size that fits a 25 MB upload</p><div class="to"><span>TRIM</span><span>CROP</span><span>RESIZE</span><span>SPEED</span><span>MUTE</span><span>COMPRESS</span><span>FRAME</span><span>SUBTITLES</span></div></div>
+      <div class="fmt"><h3>Audio</h3><p class="from">Any audio file</p><div class="to"><span>TRIM</span><span>NORMALIZE</span><span>MONO</span><span>STEREO</span></div></div>
+      <div class="fmt"><h3>PDF</h3><p class="from">One PDF, or several to merge</p><div class="to"><span>MERGE</span><span>SPLIT</span><span>ROTATE</span><span>DELETE PAGES</span><span>COMPRESS</span></div></div>
+      <div class="fmt"><h3>Archives</h3><p class="from">ZIP, 7Z, RAR, TAR, ISO, password-protected too</p><div class="to"><span>EXTRACT</span></div></div>
+      <div class="fmt"><h3>Folders</h3><p class="from">Any folder or mix of files</p><div class="to"><span>ZIP</span><span>7Z</span><span>TAR.GZ</span></div></div>
+    </div>
   </div>
 </section>
 
